@@ -282,46 +282,93 @@ function usdFromJettonPrice(price) {
   return typeof usd === 'number' && Number.isFinite(usd) ? usd : undefined;
 }
 
-async function loadHoldings() {
-  const url = `https://tonapi.io/v2/accounts/${WALLET}/jettons?currencies=usd`;
-  const data = await fetchJson(url);
-  const holdings = [];
-  const seen = new Set();
-  for (const b of data?.balances || []) {
-    const j = b.jetton || {};
-    const symbol = j.symbol || j.name;
-    const masterRaw = j.address;
-    if (!symbol || !masterRaw) continue;
-    if (isStable(j.symbol, j.name)) {
-      logLine(`skip stable ${symbol}`);
-      continue;
-    }
-    const jettonUsd = usdFromJettonPrice(b.price);
-    if (isDust(b.balance, j.decimals, jettonUsd)) {
-      logLine(`skip dust ${symbol}`);
-      continue;
-    }
-    let master;
-    try {
-      master = friendlyBounceable(masterRaw);
-    } catch {
-      master = masterRaw;
-    }
-    const key = rawAddr(master);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    holdings.push({ symbol, master, jettonUsd });
-  }
+function isMarkedSold(st, symbol) {
+  return Boolean(st?.sold?.[symbol] || st?.zero?.[symbol]);
+}
 
-  // Fallback masters are always tracked, even if the wallet read lags.
-  for (const fb of FALLBACK_COINS) {
-    const key = rawAddr(fb.master);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    holdings.push({ symbol: fb.symbol, master: fb.master, jettonUsd: undefined, fallback: true });
-    logLine(`fallback track ${fb.symbol} (not in current non-dust holdings)`);
+function markSold(st, symbol) {
+  st.sold = st.sold || {};
+  if (!st.sold[symbol]) logLine(`mark sold/zero ${symbol}`);
+  st.sold[symbol] = true;
+  if (st.ref) delete st.ref[symbol];
+  if (st.peak) delete st.peak[symbol];
+  if (st.last_alert_ts) delete st.last_alert_ts[symbol];
+}
+
+function unmarkSold(st, symbol) {
+  if (st?.sold?.[symbol] || st?.zero?.[symbol]) {
+    logLine(`unmark sold/zero ${symbol} (balance returned)`);
   }
-  return holdings;
+  if (st.sold) delete st.sold[symbol];
+  if (st.zero) delete st.zero[symbol];
+}
+
+function masterKey(master) {
+  try {
+    return rawAddr(master);
+  } catch {
+    return master;
+  }
+}
+
+async function loadHoldings(st) {
+  const url = `https://tonapi.io/v2/accounts/${WALLET}/jettons?currencies=usd`;
+  try {
+    const data = await fetchJson(url);
+    if (!Array.isArray(data?.balances)) {
+      throw new Error('tonapi jettons: missing balances array');
+    }
+    const holdings = [];
+    const seen = new Set();
+    for (const b of data.balances) {
+      const j = b.jetton || {};
+      const symbol = j.symbol || j.name;
+      const masterRaw = j.address;
+      if (!symbol || !masterRaw) continue;
+      if (isStable(j.symbol, j.name)) {
+        logLine(`skip stable ${symbol}`);
+        continue;
+      }
+      const jettonUsd = usdFromJettonPrice(b.price);
+      if (isDust(b.balance, j.decimals, jettonUsd)) {
+        logLine(`skip dust ${symbol}`);
+        continue;
+      }
+      let master;
+      try {
+        master = friendlyBounceable(masterRaw);
+      } catch {
+        master = masterRaw;
+      }
+      const key = rawAddr(master);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      holdings.push({ symbol, master, jettonUsd });
+    }
+
+    // Only live non-dust balances are watched. Coins that left the wallet
+    // are marked sold/zero so a later fallback path will not re-alert them.
+    st.sold = st.sold || {};
+    for (const [sym, master] of Object.entries(st.masters || {})) {
+      if (!master) continue;
+      const present = holdings.some((h) => sameAddr(h.master, master) || masterKey(h.master) === masterKey(master));
+      if (!present) markSold(st, sym);
+      else unmarkSold(st, sym);
+    }
+    return holdings;
+  } catch (e) {
+    logLine(`jettons call failed, using fallback coins: ${e.message || e}`);
+    const holdings = [];
+    for (const fb of FALLBACK_COINS) {
+      if (isMarkedSold(st, fb.symbol)) {
+        logLine(`fallback skip ${fb.symbol} (marked sold/zero)`);
+        continue;
+      }
+      holdings.push({ symbol: fb.symbol, master: fb.master, jettonUsd: undefined, fallback: true });
+      logLine(`fallback track ${fb.symbol} (jettons call failed)`);
+    }
+    return holdings;
+  }
 }
 
 function symbolKey(holdings, coin, st) {
@@ -395,7 +442,7 @@ async function maybeAlert(coin, payload, st, hook) {
 
 async function tick(st, hook) {
   rollDailyCap(st);
-  const holdings = await loadHoldings();
+  const holdings = await loadHoldings(st);
   if (!holdings.length) {
     logLine('no holdings to watch');
     return st;

@@ -27,12 +27,14 @@ jobs:
           node-version: '20'
 
       - name: Run watcher
+        continue-on-error: true
         env:
           TON_ALERT_WEBHOOK_URL: ${{ secrets.TON_ALERT_WEBHOOK_URL }}
           TON_ALERT_WEBHOOK_KEY: ${{ secrets.TON_ALERT_WEBHOOK_KEY }}
         run: node watch.mjs
 
       - name: Commit state
+        continue-on-error: true
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -43,17 +45,45 @@ jobs:
             exit 0
           fi
           git commit -m "chore: update state.json [skip ci]"
+          cp -f state.json /tmp/state.ours.json
           for i in 1 2 3; do
-            if git pull --rebase origin HEAD && git push; then
+            if git pull --rebase origin main && git push; then
               exit 0
             fi
             echo "push failed, retry ${i}"
+            git rebase --abort 2>/dev/null || true
+            git fetch origin
+            git reset --hard origin/main
+            cp -f /tmp/state.ours.json state.json
+            git add state.json
+            if git diff --staged --quiet; then
+              echo "state.json matches remote"
+              exit 0
+            fi
+            git commit -m "chore: update state.json [skip ci]"
             sleep $((i * 5))
           done
+          echo "giving up on state.json push; next run will retry"
           exit 1
 
-      - name: Re-dispatch (fallback for delayed/skipped cron)
-        if: always()
+  redispatch:
+    needs: watch
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Re-dispatch next watch
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run watch.yml -R "${{ github.repository }}" --ref main || true
+        run: |
+          set -euo pipefail
+          for i in 1 2 3; do
+            if gh workflow run watch.yml -R "${{ github.repository }}" --ref main; then
+              echo "re-dispatched (attempt ${i})"
+              exit 0
+            fi
+            echo "dispatch failed, retry ${i}"
+            sleep $((i * 5))
+          done
+          echo "re-dispatch failed after 3 attempts"
+          exit 1
