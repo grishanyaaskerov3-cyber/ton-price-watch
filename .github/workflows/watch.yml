@@ -1,0 +1,52 @@
+name: watch
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run watcher
+        env:
+          TON_ALERT_WEBHOOK_URL: ${{ secrets.TON_ALERT_WEBHOOK_URL }}
+          TON_ALERT_WEBHOOK_KEY: ${{ secrets.TON_ALERT_WEBHOOK_KEY }}
+        run: node watch.mjs
+
+      - name: Commit state
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          if git diff --staged --quiet; then
+            echo "state.json unchanged"
+            exit 0
+          fi
+          git commit -m "chore: update state.json [skip ci]"
+          for i in 1 2 3; do
+            if git pull --rebase origin HEAD && git push; then
+              exit 0
+            fi
+            echo "push failed, retry ${i}"
+            sleep $((i * 5))
+          done
+          exit 1

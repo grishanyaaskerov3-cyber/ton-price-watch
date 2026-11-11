@@ -1,0 +1,27 @@
+{
+  "kyiv_date": "2026-11-11",
+  "alerts_today": 2,
+  "last_alert_ts": {
+    "CHERRY": 1794415125245
+  },
+  "ref": {
+    "STORM": 0.004177550604333564,
+    "CHERRY": 0.000011133617716609522,
+    "SP": 0.003706057121585113
+  },
+  "entry": {
+    "STORM": 0.004297,
+    "CHERRY": 0.000012769,
+    "SP": 0.00387
+  },
+  "peak": {
+    "STORM": 0.004297,
+    "CHERRY": 0.000012769,
+    "SP": 0.00387
+  },
+  "masters": {
+    "STORM": "EQBsosmcZrD6FHijA7qWGLw5wo_aH8UN435hi935jJ_STORM",
+    "CHERRY": "EQBKRSNRkeP1-2jcg5T_f__0s5Hj-vrbfNLMQy8dnZs7xd_p",
+    "SP": "EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8"
+  }
+}
