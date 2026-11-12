@@ -8,11 +8,11 @@
       "breakeven_armed": false,
       "below_stop_ticks": 0,
       "status": "open",
-      "last_price_ton": 0.003506536100472142,
-      "last_pnl_pct": -0.03,
+      "last_price_ton": 0.0034977615986513905,
+      "last_pnl_pct": -0.28,
       "stop_ton": 0.0030867848,
       "stop_kind": "hard -12%",
-      "last_check": "2026-11-12T14:33:33 Kyiv"
+      "last_check": "2026-11-12T14:37:54 Kyiv"
     },
     "SP": {
       "master": "EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8",
@@ -22,11 +22,11 @@
       "breakeven_armed": false,
       "below_stop_ticks": 0,
       "status": "open",
-      "last_price_ton": 0.003139406206137441,
-      "last_pnl_pct": -0.63,
+      "last_price_ton": 0.003125652366218978,
+      "last_pnl_pct": -1.07,
       "stop_ton": 0.0027802192,
       "stop_kind": "hard -12%",
-      "last_check": "2026-11-12T14:33:33 Kyiv"
+      "last_check": "2026-11-12T14:37:54 Kyiv"
     },
     "UTYA": {
       "master": "EQBaCgUwOoc6gHCNln_oJzb0mVs79YG7wYoavh-o1ItaneLA",
@@ -36,13 +36,13 @@
       "breakeven_armed": false,
       "below_stop_ticks": 0,
       "status": "open",
-      "last_price_ton": 0.022093389291070863,
-      "last_pnl_pct": 8.39,
+      "last_price_ton": 0.021992525103865887,
+      "last_pnl_pct": 7.9,
       "stop_ton": 0.017936511999999998,
       "stop_kind": "hard -12%",
-      "last_check": "2026-11-12T14:33:34 Kyiv"
+      "last_check": "2026-11-12T14:37:55 Kyiv"
     }
   },
   "final_liquidation_done": false,
-  "last_total_ton": 1.2248
+  "last_total_ton": 1.2218
 }
