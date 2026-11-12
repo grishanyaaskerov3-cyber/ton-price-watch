@@ -4,21 +4,25 @@
   "last_alert_ts": {},
   "ref": {
     "STORM": 0.004177550604333564,
-    "SP": 0.003706057121585113
+    "SP": 0.003706057121585113,
+    "UTYA": 0.024161120964582
   },
   "entry": {
     "STORM": 0.004297,
     "CHERRY": 0.000012769,
-    "SP": 0.00387
+    "SP": 0.00387,
+    "UTYA": 0.024161120964582
   },
   "peak": {
     "STORM": 0.004328894281596147,
-    "SP": 0.00387
+    "SP": 0.00387,
+    "UTYA": 0.024181238467466747
   },
   "masters": {
     "STORM": "EQBsosmcZrD6FHijA7qWGLw5wo_aH8UN435hi935jJ_STORM",
     "CHERRY": "EQBKRSNRkeP1-2jcg5T_f__0s5Hj-vrbfNLMQy8dnZs7xd_p",
-    "SP": "EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8"
+    "SP": "EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8",
+    "UTYA": "EQBaCgUwOoc6gHCNln_oJzb0mVs79YG7wYoavh-o1ItaneLA"
   },
   "sold": {
     "CHERRY": true
