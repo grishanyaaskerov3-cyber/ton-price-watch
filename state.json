@@ -7,12 +7,14 @@
       "peak_ton": 0.003582,
       "breakeven_armed": false,
       "below_stop_ticks": 0,
-      "status": "open",
+      "status": "closed",
       "last_price_ton": 0.0035153560271670545,
       "last_pnl_pct": 0.22,
       "stop_ton": 0.0030867848,
       "stop_kind": "hard -12%",
-      "last_check": "2026-11-12T16:19:45 Kyiv"
+      "last_check": "2026-11-12T16:19:45 Kyiv",
+      "closed": "2026-11-12T16:22 Kyiv",
+      "exit_reason": "owner withdrawal (manual liquidation)"
     },
     "SP": {
       "master": "EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8",
@@ -21,12 +23,14 @@
       "peak_ton": 0.00315934,
       "breakeven_armed": false,
       "below_stop_ticks": 0,
-      "status": "open",
+      "status": "closed",
       "last_price_ton": 0.003109516416490243,
       "last_pnl_pct": -1.58,
       "stop_ton": 0.0027802192,
       "stop_kind": "hard -12%",
-      "last_check": "2026-11-12T16:19:45 Kyiv"
+      "last_check": "2026-11-12T16:19:45 Kyiv",
+      "closed": "2026-11-12T16:22 Kyiv",
+      "exit_reason": "owner withdrawal (manual liquidation)"
     },
     "UTYA": {
       "master": "EQBaCgUwOoc6gHCNln_oJzb0mVs79YG7wYoavh-o1ItaneLA",
@@ -35,14 +39,22 @@
       "peak_ton": 0.022093389291070863,
       "breakeven_armed": false,
       "below_stop_ticks": 0,
-      "status": "open",
+      "status": "closed",
       "last_price_ton": 0.01928106666947831,
       "last_pnl_pct": -5.4,
       "stop_ton": 0.017936511999999998,
       "stop_kind": "hard -12%",
-      "last_check": "2026-11-12T16:19:46 Kyiv"
+      "last_check": "2026-11-12T16:19:46 Kyiv",
+      "closed": "2026-11-12T16:22 Kyiv",
+      "exit_reason": "owner withdrawal (manual liquidation)"
     }
   },
   "final_liquidation_done": false,
-  "last_total_ton": 1.1871
+  "last_total_ton": 1.1871,
+  "liquidated_and_withdrawn": {
+    "at": "2026-11-12T16:24:44 Kyiv",
+    "to": "UQCadKD6BlXS5LTt6KCTTIQUmqCo_rOZb_hR7pEixMH3pkNv",
+    "ton": 1.14784806,
+    "event": "28200a347410517fc525cf4b365a5b3b9b0d9d8e41f791c5adf869f707a73234"
+  }
 }
