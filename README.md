@@ -1,29 +1,22 @@
 # ton-price-watch
 
-GitHub Actions watcher for jetton prices in a TON wallet. It **never trades** and never reads a wallet mnemonic. It only posts an alert webhook when a watched coin moves enough versus a rolling reference price.
+GitHub Actions **autonomous seller** for jetton positions in TON wallet `UQDsZEJaCZSx1I2TPf69OSaIZDaeDgJMpyMcUJZaRv4BJLZ2`.
+It calls no webhook and wakes no assistant.
 
-## Rules
+## Rules (per position, prices in TON = real STON.fi sell quote for the whole position)
+- Hard stop: −12% from entry.
+- Once the peak reaches +15% over entry, the stop moves to breakeven. After that it trails 15% below the highest price seen, and it never drops below breakeven. There is no fixed take-profit.
+- A stop must be breached on 2 consecutive checks (about 1 minute apart) before selling, which filters single bad quotes.
+- On a trigger the whole position is sold to TON via a STON.fi router swap (7% slippage cap).
+- From 26 Nov 2026 00:00 Kyiv (after 25 Nov), everything is sold to TON. Then a FINAL line is written to `trades.log` and the workflow disables itself.
+- It never buys, never approves tokens, and sends nothing except the STON.fi jetton→TON swap. The swap must target the wallet's own jetton wallet, with at most 0.5 TON gas attached.
 
-- Poll [tonapi](https://tonapi.io) about once a minute (each workflow run loops for ~4.5 minutes; the workflow itself is scheduled every 5 minutes).
-- Holdings are read from the wallet automatically. Zero/dust balances and stablecoins (USDT and similar) are ignored. STORM, CHERRY, and SP are always tracked as a fallback.
-- A newly seen coin gets `ref = current price` and does **not** alert on first sight.
-- `drop` alert: price ≤ ref × 0.95 (cumulative −5% from the reference).
-- `pump` alert: price ≥ ref × 1.20 (cumulative +20% from the reference).
-- After a successful alert (HTTP 2xx), that coin’s reference is reset to the price at alert time.
-- Caps: at most 1 alert per coin per 20 minutes, and 12 alerts per Kyiv calendar day.
-- `state.json` in this repo holds references, peaks, entries, and daily counters. The workflow commits it when it changes.
+## Files
+- `state.json`: entries, peaks, stops, status, committed by the workflow.
+- `trades.log`: JSONL of every sell sent, confirmed or failed.
 
-## Secrets
+## Secret
+- `TON_MNEMONIC`: the trading wallet mnemonic. It is never printed, and the script refuses to run if the secret doesn't derive the expected wallet.
 
-Set these repository secrets (Actions → Secrets). The values are never written to logs.
-
-- `TON_ALERT_WEBHOOK_URL`
-- `TON_ALERT_WEBHOOK_KEY` (sent as `Authorization: Bearer …`)
-
-## Manual run
-
-Actions → watch → Run workflow. A local dry run (no webhook):
-
-```bash
-WATCH_DRY=1 WATCH_ONCE=1 node watch.mjs
-```
+## Local dry run
+`TRADE_DRY=1 WATCH_ONCE=1 node trader.mjs`

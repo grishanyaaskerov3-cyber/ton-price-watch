@@ -1,30 +1,48 @@
 {
-  "kyiv_date": "2026-11-12",
-  "alerts_today": 0,
-  "last_alert_ts": {},
-  "ref": {
-    "STORM": 0.004177550604333564,
-    "SP": 0.003706057121585113,
-    "UTYA": 0.024161120964582
+  "positions": {
+    "STORM": {
+      "master": "EQBsosmcZrD6FHijA7qWGLw5wo_aH8UN435hi935jJ_STORM",
+      "decimals": 9,
+      "entry_ton": 0.00350771,
+      "peak_ton": 0.003582,
+      "breakeven_armed": false,
+      "below_stop_ticks": 0,
+      "status": "open",
+      "last_price_ton": 0.003512195133183796,
+      "last_pnl_pct": 0.13,
+      "stop_ton": 0.0030867848,
+      "stop_kind": "hard -12%",
+      "last_check": "2026-11-12T13:20:34 Kyiv"
+    },
+    "SP": {
+      "master": "EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8",
+      "decimals": 8,
+      "entry_ton": 0.00315934,
+      "peak_ton": 0.00315934,
+      "breakeven_armed": false,
+      "below_stop_ticks": 0,
+      "status": "open",
+      "last_price_ton": 0.0031236159516764453,
+      "last_pnl_pct": -1.13,
+      "stop_ton": 0.0027802192,
+      "stop_kind": "hard -12%",
+      "last_check": "2026-11-12T13:20:34 Kyiv"
+    },
+    "UTYA": {
+      "master": "EQBaCgUwOoc6gHCNln_oJzb0mVs79YG7wYoavh-o1ItaneLA",
+      "decimals": 9,
+      "entry_ton": 0.0203824,
+      "peak_ton": 0.0217252233,
+      "breakeven_armed": false,
+      "below_stop_ticks": 0,
+      "status": "open",
+      "last_price_ton": 0.021177611598889014,
+      "last_pnl_pct": 3.9,
+      "stop_ton": 0.017936511999999998,
+      "stop_kind": "hard -12%",
+      "last_check": "2026-11-12T13:20:35 Kyiv"
+    }
   },
-  "entry": {
-    "STORM": 0.004297,
-    "CHERRY": 0.000012769,
-    "SP": 0.00387,
-    "UTYA": 0.024161120964582
-  },
-  "peak": {
-    "STORM": 0.0044443905978323915,
-    "SP": 0.0039305972743665435,
-    "UTYA": 0.02717181391371955
-  },
-  "masters": {
-    "STORM": "EQBsosmcZrD6FHijA7qWGLw5wo_aH8UN435hi935jJ_STORM",
-    "CHERRY": "EQBKRSNRkeP1-2jcg5T_f__0s5Hj-vrbfNLMQy8dnZs7xd_p",
-    "SP": "EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8",
-    "UTYA": "EQBaCgUwOoc6gHCNln_oJzb0mVs79YG7wYoavh-o1ItaneLA"
-  },
-  "sold": {
-    "CHERRY": true
-  }
+  "final_liquidation_done": false,
+  "last_total_ton": 1.2123
 }

@@ -25,13 +25,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
 
-      - name: Run watcher
+      - name: Install deps
+        run: npm ci --no-audit --no-fund --loglevel=error
+
+      - name: Run trader (stop / trailing-stop seller, no webhook)
         continue-on-error: true
         env:
-          TON_ALERT_WEBHOOK_URL: ${{ secrets.TON_ALERT_WEBHOOK_URL }}
-          TON_ALERT_WEBHOOK_KEY: ${{ secrets.TON_ALERT_WEBHOOK_KEY }}
-        run: node watch.mjs
+          TON_MNEMONIC: ${{ secrets.TON_MNEMONIC }}
+        run: node trader.mjs
 
       - name: Commit state
         continue-on-error: true
@@ -39,13 +42,14 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add state.json
+          git add state.json trades.log
           if git diff --staged --quiet; then
-            echo "state.json unchanged"
+            echo "state unchanged"
             exit 0
           fi
           git commit -m "chore: update state.json [skip ci]"
           cp -f state.json /tmp/state.ours.json
+          cp -f trades.log /tmp/trades.ours.log
           for i in 1 2 3; do
             if git pull --rebase origin main && git push; then
               exit 0
@@ -55,7 +59,8 @@ jobs:
             git fetch origin
             git reset --hard origin/main
             cp -f /tmp/state.ours.json state.json
-            git add state.json
+            cp -f /tmp/trades.ours.log trades.log
+            git add state.json trades.log
             if git diff --staged --quiet; then
               echo "state.json matches remote"
               exit 0
@@ -65,6 +70,16 @@ jobs:
           done
           echo "giving up on state.json push; next run will retry"
           exit 1
+
+      - name: Self-disable after final liquidation
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f .disable-workflow ]; then
+            echo "final liquidation done; disabling workflow"
+            gh workflow disable watch.yml -R "${{ github.repository }}"
+          fi
 
   redispatch:
     needs: watch
